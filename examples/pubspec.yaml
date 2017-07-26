@@ -1,0 +1,8 @@
+# Copyright (c) 2017 P.Y. Laligand
+name: heroku_slack_bot_example
+author: P.Y. Laligand
+version: 0.0.1
+description: Example server!
+dependencies:
+  heroku_slack_bot:
+    path: ..
