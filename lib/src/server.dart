@@ -18,7 +18,7 @@ import 'server_config.dart';
 String _getConfigValue(String name) {
   final value = Platform.environment[name];
   if (value == null) {
-    throw 'Missing configuration value for $name';
+    throw 'Missing configuration value for "$name"';
   }
   return value;
 }
@@ -40,6 +40,9 @@ runServer(ServerConfig config) async {
   final slackClientSecret = _getConfigValue('SLACK_CLIENT_SECRET');
   final slackVerificationToken = _getConfigValue('SLACK_VERIFICATION_TOKEN');
 
+  final environment =
+      new Map.fromIterable(config.environmentVariables, value: _getConfigValue);
+
   final baseMiddleware = const shelf.Pipeline()
       .addMiddleware(
           shelf.logRequests(logger: (String message, _) => log.info(message)))
@@ -58,7 +61,8 @@ runServer(ServerConfig config) async {
           ..addAll(new AuthHandler(slackClientId, slackClientSecret),
               path: '/auth')
           ..addAll((Router r) {
-            config.commands
+            config
+                .loadCommands(environment)
                 .forEach((name, handler) => r.addAll(handler, path: '/$name'));
             return r;
           }, path: '/commands', middleware: commandMiddleware),
