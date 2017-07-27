@@ -12,6 +12,10 @@ class Config extends ServerConfig {
   Map<String, SlackCommandHandler> get commands => {
         'dummy': new DummyHandler(),
       };
+
+  @override
+  List<String> get stallingMessages =>
+      ['Please wait a second', 'Don\'t be so impatient'];
 }
 
 main() async {

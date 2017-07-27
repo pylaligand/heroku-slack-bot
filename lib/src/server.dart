@@ -10,6 +10,7 @@ import 'package:shelf_route/shelf_route.dart';
 
 import 'handlers/auth_handler.dart';
 import 'middleware/slack_verification_middleware.dart';
+import 'middleware/stalling_message_provider.dart';
 
 import 'server_config.dart';
 
@@ -47,6 +48,7 @@ runServer(ServerConfig config) async {
   final commandMiddleware = const shelf.Pipeline()
       .addMiddleware(SlackVerificationMiddleware.get(
           slackVerificationToken, useDelayedResponses))
+      .addMiddleware(StallingMessageMiddleware.get(config.stallingMessages))
       .middleware;
 
   final rootRouter = router()
