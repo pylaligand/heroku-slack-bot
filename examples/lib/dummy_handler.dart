@@ -10,11 +10,18 @@ import 'package:shelf/shelf.dart' as shelf;
 class DummyHandler extends SlackCommandHandler {
   final Logger _log = new Logger('DummyHandler');
 
+  final String _password;
+
+  DummyHandler(this._password);
+
   @override
   Future<shelf.Response> handle(shelf.Request request) async {
     final params = request.context;
     final String userName = params[SLACK_USERNAME];
     _log.info('Request from $userName');
-    return createTextResponse('Hello $userName!', private: true);
+    return createTextResponse(
+      'Hello $userName, the password is "$_password!"',
+      private: true,
+    );
   }
 }

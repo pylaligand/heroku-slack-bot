@@ -7,10 +7,17 @@ abstract class ServerConfig {
   /// The name of the server.
   String get name;
 
-  /// The supported commands indexed by command name.
+  /// The names of environment variables used to build the server.
   ///
-  /// The name will be used in the URI path to access the command.
-  Map<String, SlackCommandHandler> get commands;
+  /// This will be used when constructing commands and such.
+  List<String> get environmentVariables => [];
+
+  /// Returns the supported commands indexed by command name.
+  ///
+  /// The name will be used in the URI path to access the command as
+  /// `/commands/{name}`.
+  Map<String, SlackCommandHandler> loadCommands(
+      Map<String, String> environment);
 
   /// The temporary message displayed to the user while processing long queries.
   List<String> get stallingMessages => ['Processing request...'];

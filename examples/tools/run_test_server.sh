@@ -13,4 +13,6 @@ export SLACK_VERIFICATION_TOKEN=abcdefgh
 export SLACK_CLIENT_ID=12345678
 export SLACK_CLIENT_SECRET=87654321
 
+export PASSWORD=drowssap
+
 dart bin/server.dart
