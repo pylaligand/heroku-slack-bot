@@ -14,13 +14,6 @@ import '../utils/slack_format.dart';
 export '../utils/context_params.dart';
 export '../utils/slack_format.dart';
 
-const _STALLING_MESSAGES = const [
-  // XXX
-  'The Cryptarchs are on it...',
-  'Contacting Destiny servers...',
-  'Hold on a second, yesssssss?',
-];
-
 const _RESPONSE_TIMEOUT = const Duration(seconds: 2, milliseconds: 500);
 
 /// Base class for command handlers.
@@ -61,24 +54,26 @@ abstract class SlackCommandHandler extends Routeable {
     new Future.delayed(_RESPONSE_TIMEOUT, () {
       if (!completer.isCompleted) {
         // No result was returned, send a canned reply to prevent a timeout.
-        completer.complete(_createStallingResponse());
+        completer
+            .complete(_createStallingResponse(params[param.STALLING_MESSAGES]));
       }
     });
     return completer.future;
   }
 
-  shelf.Response _createStallingResponse() {
+  shelf.Response _createStallingResponse(List<String> messages) {
     _log.info('Stalling');
-    return createTextResponse(
-        _STALLING_MESSAGES[new Random().nextInt(_STALLING_MESSAGES.length)]);
+    return createTextResponse(messages[new Random().nextInt(messages.length)]);
   }
 
   _forwardToUrl(String url, shelf.Response response) async {
     _log.info('Forwarding answer');
-    // XXX: error verification
-    http.post(url,
+    final postResponse = await http.post(url,
         body: await response.readAsString(),
         headers: {'content-type': 'application/json'});
+    if (postResponse.statusCode != 200) {
+      _log.warning('Failed to send follow-up message: $postResponse');
+    }
   }
 
   /// Called to process a command.

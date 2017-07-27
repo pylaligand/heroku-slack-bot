@@ -11,4 +11,7 @@ abstract class ServerConfig {
   ///
   /// The name will be used in the URI path to access the command.
   Map<String, SlackCommandHandler> get commands;
+
+  /// The temporary message displayed to the user while processing long queries.
+  List<String> get stallingMessages => ['Processing request...'];
 }
