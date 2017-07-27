@@ -5,3 +5,5 @@ export 'src/server_config.dart';
 
 export 'src/handlers/auth_handler.dart';
 export 'src/handlers/slack_command_handler.dart';
+
+export 'src/utils/slack_client.dart';

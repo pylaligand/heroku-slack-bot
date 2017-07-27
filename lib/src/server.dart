@@ -9,15 +9,16 @@ import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_route/shelf_route.dart';
 
 import 'handlers/auth_handler.dart';
+import 'middleware/slack_client_provider.dart';
 import 'middleware/slack_verification_middleware.dart';
 import 'middleware/stalling_message_provider.dart';
 
 import 'server_config.dart';
 
 /// Returns the value for [name] in the server configuration.
-String _getConfigValue(String name) {
+String _getConfigValue(String name, {bool failIfAbsent: true}) {
   final value = Platform.environment[name];
-  if (value == null) {
+  if (value == null && failIfAbsent) {
     throw 'Missing configuration value for "$name"';
   }
   return value;
@@ -34,11 +35,16 @@ runServer(ServerConfig config) async {
   final portEnv = Platform.environment['PORT'];
   final port = portEnv == null ? 9999 : int.parse(portEnv);
 
+  // TODO(pylaligand): move the env var names to a separate file.
   final useDelayedResponses =
       _getConfigValue('USE_DELAYED_RESPONSES') == 'true';
   final slackClientId = _getConfigValue('SLACK_CLIENT_ID');
   final slackClientSecret = _getConfigValue('SLACK_CLIENT_SECRET');
   final slackVerificationToken = _getConfigValue('SLACK_VERIFICATION_TOKEN');
+  final slackOauthToken =
+      _getConfigValue('SLACK_OAUTH_ACCESS_TOKEN', failIfAbsent: false);
+  final slackBotOauthToken =
+      _getConfigValue('SLACK_BOT_OAUTH_ACCESS_TOKEN', failIfAbsent: false);
 
   final environment =
       new Map.fromIterable(config.environmentVariables, value: _getConfigValue);
@@ -52,6 +58,8 @@ runServer(ServerConfig config) async {
       .addMiddleware(SlackVerificationMiddleware.get(
           slackVerificationToken, useDelayedResponses))
       .addMiddleware(StallingMessageMiddleware.get(config.stallingMessages))
+      .addMiddleware(
+          SlackClientProvider.get(slackOauthToken, slackBotOauthToken))
       .middleware;
 
   final rootRouter = router()
