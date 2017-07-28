@@ -11,6 +11,8 @@ import 'utils/slack_client.dart';
 ///
 /// Can be used for periodic or long-running tasks.
 abstract class BackgroundTask {
+  Map<String, String> _environment;
+
   /// Returns a client to interact with the Slack API.
   SlackClient get slackClient =>
       new SlackClient(getEnv(SLACK_OAUTH_ACCESS_TOKEN));
@@ -19,8 +21,12 @@ abstract class BackgroundTask {
   SlackClient get slackBotClient =>
       new SlackClient(getEnv(SLACK_BOT_OAUTH_ACCESS_TOKEN));
 
-  // TODO(pylaligand): support for extracting env variables.
-  // This would allow us to hide the environment manipulation API.
+  /// The names of environment variables used by this task.
+  List<String> get environmentVariables => [];
+
+  /// The environment needed by the task.
+  Map<String, String> get environment => _environment ??=
+      new Map.fromIterable(environmentVariables, value: getEnv);
 
   /// Runs the task.
   run() async {
