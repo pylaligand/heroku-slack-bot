@@ -43,13 +43,16 @@ runServer(ServerConfig config) async {
           shelf.logRequests(logger: (String message, _) => log.info(message)))
       .middleware;
 
-  final commandMiddleware = const shelf.Pipeline()
+  shelf.Pipeline commandPipeline = const shelf.Pipeline()
       .addMiddleware(SlackVerificationMiddleware.get(
           slackVerificationToken, useDelayedResponses))
       .addMiddleware(StallingMessageMiddleware.get(config.stallingMessages))
       .addMiddleware(
-          SlackClientProvider.get(slackOauthToken, slackBotOauthToken))
-      .middleware;
+          SlackClientProvider.get(slackOauthToken, slackBotOauthToken));
+  for (shelf.Middleware middleware in config.loadMiddleware(environment)) {
+    commandPipeline = commandPipeline.addMiddleware(middleware);
+  }
+  final commandMiddleware = commandPipeline.middleware;
 
   final rootRouter = router()
     ..addAll(

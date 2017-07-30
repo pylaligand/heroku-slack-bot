@@ -1,7 +1,7 @@
 // Copyright (c) 2017 P.Y. Laligand
 
 export 'package:logging/logging.dart' show Logger;
-export 'package:shelf/shelf.dart' show Request, Response;
+export 'package:shelf/shelf.dart' show Handler, Middleware, Request, Response;
 
 export 'src/background_task.dart';
 export 'src/server.dart';

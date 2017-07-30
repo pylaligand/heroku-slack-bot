@@ -1,6 +1,10 @@
 // Copyright (c) 2017 P.Y. Laligand
 
+import 'package:shelf/shelf.dart' show Middleware;
+
 import 'handlers/slack_command_handler.dart';
+
+export 'package:shelf/shelf.dart' show Middleware;
 
 /// Configuration of the bot server.
 abstract class ServerConfig {
@@ -18,6 +22,9 @@ abstract class ServerConfig {
   /// `/commands/{name}`.
   Map<String, SlackCommandHandler> loadCommands(
       Map<String, String> environment);
+
+  /// Returns the middleware to add to the command pipeline.
+  List<Middleware> loadMiddleware(Map<String, String> environment) => const [];
 
   /// The temporary message displayed to the user while processing long queries.
   List<String> get stallingMessages => ['Processing request...'];
