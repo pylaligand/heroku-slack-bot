@@ -25,6 +25,8 @@ class AuthHandler extends Routeable {
   Future<shelf.Response> _handleRequest(shelf.Request request) async {
     _log.info(request.requestedUri);
     final code = request.url.queryParameters['code'];
+    // TODO(pylaligand): move this to SlackClient, with an unauthenticated
+    // constructor.
     final url = new Uri.https('slack.com', 'api/oauth.access',
         {'client_id': _clientId, 'client_secret': _clientSecret, 'code': code});
     final data = await json.get(url.toString(), _log);
