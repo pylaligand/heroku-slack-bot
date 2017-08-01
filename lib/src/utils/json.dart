@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math' show max;
 
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
@@ -10,14 +11,18 @@ import 'package:logging/logging.dart';
 class JsonException implements Exception {
   final String _message;
   final Exception _exception;
+  final int code;
 
-  JsonException({String message, Exception exception})
+  JsonException({String message, Exception exception, this.code})
       : _message = message,
         _exception = exception;
 
   @override
   String toString() {
     String result = 'JsonException';
+    if (code != null) {
+      result += ': $code';
+    }
     if (_message != null) {
       result += ': $_message';
     }
@@ -35,17 +40,17 @@ Future<dynamic> getJson(dynamic url, Logger log,
   final response = await http.get(url, headers: headers);
   if (response.statusCode == 429) {
     final int retryAfter =
-        int.parse(response.headers['retry-after'], onError: (_) => 5);
-    log.warning('Rate limited, retrying in $retryAfter seconds');
-    return () async {
-      await new Future.delayed(new Duration(seconds: retryAfter));
-      return await getJson(url, log, headers: headers);
-    }();
-  }
-  if (response.statusCode != 200) {
-    throw new JsonException(message: 'Request failed');
+        max(1, int.parse(response.headers['retry-after'], onError: (_) => 5));
+    log.warning('Rate limited, retrying in $retryAfter second(s)');
+    await new Future.delayed(new Duration(seconds: retryAfter));
+    return getJson(url, log, headers: headers);
   }
   final body = response.body;
+  if (response.statusCode != 200) {
+    throw new JsonException(
+        message: 'Request failed [${response.statusCode}]: $body',
+        code: response.statusCode);
+  }
   if (body == null) {
     log.warning('Empty response');
     throw new JsonException(message: 'Empty response');
