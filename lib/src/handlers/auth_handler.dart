@@ -6,7 +6,7 @@ import 'package:logging/logging.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf_route/shelf_route.dart';
 
-import '../utils/json.dart' as json;
+import '../utils/json.dart';
 
 /// Handles authentication responses when registering a Slack app.
 class AuthHandler extends Routeable {
@@ -29,7 +29,7 @@ class AuthHandler extends Routeable {
     // constructor.
     final url = new Uri.https('slack.com', 'api/oauth.access',
         {'client_id': _clientId, 'client_secret': _clientSecret, 'code': code});
-    final data = await json.get(url.toString(), _log);
+    final data = await getJson(url.toString(), _log);
     _log.info('Authenticated: ${data["scope"]}');
     return new shelf.Response.ok('Works for us!');
   }

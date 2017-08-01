@@ -4,7 +4,7 @@ import 'dart:async';
 
 import 'package:logging/logging.dart';
 
-import '../utils/json.dart' as json;
+import '../utils/json.dart';
 
 /// Represents a member of a Slack team.
 class SlackUser {
@@ -20,6 +20,12 @@ class SlackUser {
 
   @override
   String toString() => '$name [$id] [$title]';
+
+  @override
+  int get hashCode => id.hashCode;
+
+  @override
+  bool operator ==(dynamic other) => other is SlackUser && other.id == id;
 }
 
 /// Client for the Slack API.
@@ -43,11 +49,13 @@ class SlackClient {
     String cursor = null;
     do {
       final json = await getNextBatch(cursor);
-      result.addAll(json['members'].map((dynamic member) => new SlackUser(
-            member['id'],
-            member['name'],
-            member['profile']['title'],
-          )));
+      result.addAll(json['members']
+          .where((Map member) => member['id'] != 'USLACKBOT')
+          .map((dynamic member) => new SlackUser(
+                member['id'],
+                member['name'],
+                member['profile']['title'],
+              )));
       cursor = json['response_metadata']['next_cursor'];
     } while (cursor != null && cursor.isNotEmpty);
     return result;
@@ -100,7 +108,7 @@ class SlackClient {
   /// Requests JSON data from the given URL.
   /// Returns null if the request failed.
   Future<dynamic> _getJson(Uri url) async {
-    final result = await json.get(url.toString(), _log);
+    final result = await getJson(url.toString(), _log);
     if (!result['ok']) {
       _log.warning('Error in response: ${result['error']}');
       return null;
