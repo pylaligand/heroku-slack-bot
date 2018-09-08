@@ -10,5 +10,6 @@ const SLACK_USERNAME = 'slack_param_user_name';
 const SLACK_RESPONSE_URL = 'slack_param_response_url';
 const USE_DELAYED_RESPONSES = 'use_delayed_responses';
 const STALLING_MESSAGES = 'stalling_messages';
+const ERROR_MESSAGE = 'error_message';
 const SLACK_CLIENT = 'slack_client';
 const SLACK_BOT_CLIENT = 'slack_bot_client';

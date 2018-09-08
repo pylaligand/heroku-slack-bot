@@ -39,10 +39,10 @@ abstract class SlackCommandHandler extends Routeable {
   Future<shelf.Response> _handleRequest(shelf.Request request) async {
     final params = request.context;
     if (!params[param.USE_DELAYED_RESPONSES]) {
-      return handle(request);
+      return _callHandler(request);
     }
     final completer = new Completer();
-    handle(request).then((response) {
+    _callHandler(request).then((response) {
       if (!completer.isCompleted) {
         completer.complete(response);
       } else {
@@ -75,6 +75,13 @@ abstract class SlackCommandHandler extends Routeable {
       _log.warning('Failed to send follow-up message: $postResponse');
     }
   }
+
+  /// Calls the request handler, handling any exception that may occur.
+  Future<shelf.Response> _callHandler(shelf.Request request) =>
+      handle(request).catchError((Exception e) {
+        _log.severe('Encountered handler error: $e');
+        return createTextResponse(request.context[param.ERROR_MESSAGE]);
+      });
 
   /// Called to process a command.
   Future<shelf.Response> handle(shelf.Request request);
