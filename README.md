@@ -8,9 +8,7 @@
 2. Follow the steps at https://github.com/igrigorik/heroku-buildpack-dart to
    configure a new Heroku instance for a Dart app.
   - Instead of copying the example you will want to create a new Git project and
-    build a skeletal server which will be needed to set up Slack.
-  - Add a web/ directory to your repository (with an empty file) to ensure the
-    build succeeds.
+    build a skeletal server.
   - Add the Slack client id, client secret, and verification token to the
     instance's configuration.
 3. Deploy a first version of the server to Heroku.

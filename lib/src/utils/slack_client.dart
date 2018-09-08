@@ -36,6 +36,8 @@ class SlackClient {
   SlackClient(this._token);
 
   /// Returns the profiles of all users in the instance.
+  ///
+  /// Requires the `users:read` scope.
   Future<List<SlackUser>> listUsers() async {
     final result = <List<SlackUser>>[];
     final getNextBatch = (String cursor) async {
@@ -62,6 +64,8 @@ class SlackClient {
   }
 
   /// Returns the given user's profile.
+  ///
+  /// Requires the `users:read` scope.
   Future<SlackUser> getUser(String id) async {
     final url = _getUrl('users.info', {
       'user': id,

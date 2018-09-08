@@ -28,4 +28,7 @@ abstract class ServerConfig {
 
   /// The temporary message displayed to the user while processing long queries.
   List<String> get stallingMessages => ['Processing request...'];
+
+  /// The error message displayed to the user when a request handler failed.
+  String get errorMessage => 'There was an error processing this command.';
 }
